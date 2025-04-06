@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/config/theme/app_theme.dart';
+import 'package:flutter_boilerplate/features/home/presentation/widgets/conversation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/widgets/app_button.dart';
 import '../../../../core/presentation/widgets/loading_overlay.dart';
@@ -14,86 +17,50 @@ class HomePage extends ConsumerWidget {
     final user = authState.user;
     final isLoading = authState.status == AuthStatus.loading;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              ref.read(authProvider.notifier).logout();
-            },
-          ),
-        ],
-      ),
-      body: LoadingOverlay(
-        isLoading: isLoading,
-        child: user != null
-            ? Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 32),
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: user.avatar != null
-                          ? NetworkImage(user.avatar!)
-                          : null,
-                      child: user.avatar == null
-                          ? Text(
-                              user.name.substring(0, 1).toUpperCase(),
-                              style: const TextStyle(fontSize: 40),
-                            )
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Welcome, ${user.name}!',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      user.email,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 32),
-                    const Divider(),
-                    const SizedBox(height: 16),
-                    ListTile(
-                      leading: const Icon(Icons.person),
-                      title: const Text('Profile'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        context.go('/profile');
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.settings),
-                      title: const Text('Settings'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        context.go('/settings');
-                      },
-                    ),
-                    const Spacer(),
-                    AppButton(
-                      text: 'Logout',
-                      onPressed: () {
-                        ref.read(authProvider.notifier).logout();
-                      },
-                      type: AppButtonType.secondary,
-                      isFullWidth: true,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              )
-            : const Center(
-                child: Text('User not found'),
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            titleSpacing: AppSpacing.m,
+            actionsPadding:
+                const EdgeInsets.only(left: 20, right: AppSpacing.s),
+            title: const Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                '微信 (722)',
+                style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20.0,
+                    fontFamily: AppTextStyles.fontFamily),
               ),
-      ),
-    );
+            ),
+            actions: [
+              IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    print('Search...');
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/icons/search.svg',
+                    width: 30.0,
+                    height: 30.0,
+                  )),
+              IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    print('Add...');
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/icons/plus.svg',
+                    width: 30.0,
+                    height: 30.0,
+                  ))
+            ],
+          ),
+          body:
+              const TabBarView(children: [Text('好友'), Text('群组'), Text('公众号')]),
+        ));
   }
 }
