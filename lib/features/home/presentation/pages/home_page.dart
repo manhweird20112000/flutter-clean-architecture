@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/config/theme/app_theme.dart';
-import 'package:flutter_boilerplate/features/home/domain/entities/conversation.dart';
 import 'package:flutter_boilerplate/features/home/presentation/providers/conversation_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/presentation/widgets/app_button.dart';
-import '../../../../core/presentation/widgets/loading_overlay.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
 
 import '../widgets/tab_bar.dart';
 import '../widgets/conversation.dart';

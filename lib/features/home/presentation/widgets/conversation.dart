@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jiffy/jiffy.dart';
 
 import '../../../../config/theme/app_theme.dart';
 import '../../domain/entities/conversation.dart';
+
+const double MAX_SIZE_AVATAR = 60;
 
 class ConversationItem extends StatelessWidget {
   final Conversation conversation;
@@ -22,15 +25,17 @@ class ConversationItem extends StatelessWidget {
           spacing: 18,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.s),
-              child: Image.network(
-                conversation.images.first,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-              ),
-            ),
+            conversation.conversationType == ConversationType.group
+                ? buildAvatar(context, conversation.images)
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.s),
+                    child: Image.network(
+                      conversation.images.first,
+                      width: MAX_SIZE_AVATAR,
+                      height: MAX_SIZE_AVATAR,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
             Expanded(
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -106,4 +111,25 @@ class ConversationItem extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget buildAvatar(BuildContext context, List<String> images) {
+  return SizedBox(
+      width: MAX_SIZE_AVATAR,
+      child: Wrap(
+        spacing: 5,
+        runSpacing: 5,
+        children: images.asMap().entries.map((image) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.xs),
+            child: Image.network(
+              image.value,
+              width:
+                  image.key == 2 && images.length == 3 ? MAX_SIZE_AVATAR : (MAX_SIZE_AVATAR - 5) / 2,
+              height: images.length == 2 ? MAX_SIZE_AVATAR : (MAX_SIZE_AVATAR - 5) / 2,
+              fit: BoxFit.cover,
+            ),
+          );
+        }).toList(),
+      ));
 }
