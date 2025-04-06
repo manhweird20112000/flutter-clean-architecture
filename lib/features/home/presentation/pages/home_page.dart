@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/config/theme/app_theme.dart';
-import 'package:flutter_boilerplate/features/home/presentation/widgets/conversation.dart';
+import 'package:flutter_boilerplate/features/home/domain/entities/conversation.dart';
+import 'package:flutter_boilerplate/features/home/presentation/providers/conversation_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -8,21 +9,45 @@ import '../../../../core/presentation/widgets/app_button.dart';
 import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
-class HomePage extends ConsumerWidget {
-  const HomePage({Key? key}) : super(key: key);
+import '../widgets/tab_bar.dart';
+import '../widgets/conversation.dart';
+
+class HomePage extends ConsumerStatefulWidget {
+  const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-    final user = authState.user;
-    final isLoading = authState.status == AuthStatus.loading;
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends ConsumerState<HomePage> {
+  int TAB_FRIENDS = 0;
+  int TAB_GROUP = 1;
+  int TAB_ADS = 2;
+
+  int indexTabActive = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchConversations();
+  }
+
+  void fetchConversations() {
+    ref.read(homeProvider.notifier).fetchConversations();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final conversations = ref.watch(homeProvider).conversations;
     return DefaultTabController(
         length: 3,
         child: Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
             elevation: 0,
             titleSpacing: AppSpacing.m,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.white,
             actionsPadding:
                 const EdgeInsets.only(left: 20, right: AppSpacing.s),
             title: const Align(
@@ -39,8 +64,9 @@ class HomePage extends ConsumerWidget {
             actions: [
               IconButton(
                   padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: () {
-                    print('Search...');
+                    fetchConversations();
                   },
                   icon: SvgPicture.asset(
                     'assets/icons/search.svg',
@@ -49,6 +75,7 @@ class HomePage extends ConsumerWidget {
                   )),
               IconButton(
                   padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: () {
                     print('Add...');
                   },
@@ -59,8 +86,84 @@ class HomePage extends ConsumerWidget {
                   ))
             ],
           ),
-          body:
-              const TabBarView(children: [Text('好友'), Text('群组'), Text('公众号')]),
+          body: Column(children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.m, vertical: AppSpacing.xs),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      TabBarConversation(
+                        text: '好友',
+                        index: TAB_FRIENDS,
+                        isSelected: indexTabActive == TAB_FRIENDS,
+                        onChoose: () {
+                          setState(() {
+                            indexTabActive = TAB_FRIENDS;
+                          });
+                        },
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      TabBarConversation(
+                        text: '群组',
+                        index: TAB_GROUP,
+                        isSelected: indexTabActive == TAB_GROUP,
+                        onChoose: () {
+                          setState(() {
+                            indexTabActive = TAB_GROUP;
+                          });
+                        },
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      TabBarConversation(
+                        text: '公众号',
+                        index: TAB_ADS,
+                        isSelected: indexTabActive == TAB_ADS,
+                        onChoose: () {
+                          setState(() {
+                            indexTabActive = TAB_ADS;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                  IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        print('Cast...');
+                      },
+                      icon: SvgPicture.asset(
+                        'assets/icons/cast.svg',
+                        width: 30.0,
+                        height: 30.0,
+                      ))
+                ],
+              ),
+            ),
+            Expanded(
+                child: IndexedStack(
+              index: indexTabActive,
+              children: [
+                ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: conversations.length,
+                    itemBuilder: (context, index) {
+                      return ConversationItem(
+                          conversation: conversations[index]);
+                    }),
+                const Center(child: Text('Tab 2 Content')),
+                const Center(child: Text('Tab 3 Content')),
+              ],
+            ))
+          ]),
         ));
   }
 }
