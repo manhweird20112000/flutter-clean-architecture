@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jiffy/jiffy.dart';
 
 import '../../../../config/theme/app_theme.dart';
@@ -16,7 +16,9 @@ class ConversationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        print('converstion item');
+        // GoRouter.of(context).goNamed('chat',
+        //     pathParameters: {'conversationId': conversation.id.toString()});
+        GoRouter.of(context).go('/chat/${conversation.id.toString()}');
       },
       child: Container(
         padding:
@@ -124,9 +126,12 @@ Widget buildAvatar(BuildContext context, List<String> images) {
             borderRadius: BorderRadius.circular(AppSpacing.xs),
             child: Image.network(
               image.value,
-              width:
-                  image.key == 2 && images.length == 3 ? MAX_SIZE_AVATAR : (MAX_SIZE_AVATAR - 5) / 2,
-              height: images.length == 2 ? MAX_SIZE_AVATAR : (MAX_SIZE_AVATAR - 5) / 2,
+              width: image.key == 2 && images.length == 3
+                  ? MAX_SIZE_AVATAR
+                  : (MAX_SIZE_AVATAR - 5) / 2,
+              height: images.length == 2
+                  ? MAX_SIZE_AVATAR
+                  : (MAX_SIZE_AVATAR - 5) / 2,
               fit: BoxFit.cover,
             ),
           );

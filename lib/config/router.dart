@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/conversation/presentation/pages/chat_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/auth/presentation/pages/login_page.dart';
@@ -37,7 +38,7 @@ final routerNotifierProvider = Provider<RouterNotifier>((ref) {
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.watch(routerNotifierProvider);
-  
+
   return GoRouter(
     refreshListenable: notifier,
     initialLocation: '/splash',
@@ -45,6 +46,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: '/chat/:conversationId',
+        name: 'chat',
+        builder: (context, state) {
+          final String conversationId = state.pathParameters['conversationId']!;
+          return ChatPage(conversationId: conversationId);
+        },
       ),
       GoRoute(
         path: '/splash',
@@ -70,27 +79,33 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (BuildContext context, GoRouterState state) {
       // Lấy trạng thái từ notifier an toàn
       final authStatus = notifier.authStatus;
-      
+
       // Nếu đang xử lý auth hoặc chưa khởi tạo, chuyển đến splash
-      if (authStatus == null || authStatus == AuthStatus.initial || authStatus == AuthStatus.loading) {
+      if (authStatus == null ||
+          authStatus == AuthStatus.initial ||
+          authStatus == AuthStatus.loading) {
         // Nếu đã ở splash thì không chuyển hướng
         if (state.fullPath == '/splash') return null;
         return '/splash';
       }
-      
+
       // Đã xác thực
       if (authStatus == AuthStatus.authenticated) {
         // Nếu đang ở splash, login, register thì chuyển về home
-        if (state.fullPath == '/splash' || state.fullPath == '/login' || state.fullPath == '/register') {
+        if (state.fullPath == '/splash' ||
+            state.fullPath == '/login' ||
+            state.fullPath == '/register') {
           return '/';
         }
         return null;
       }
-      
+
       // Chưa xác thực
       if (authStatus == AuthStatus.unauthenticated) {
         // Nếu đang không ở login, register hoặc splash thì chuyển đến login
-        if (state.fullPath != '/login' && state.fullPath != '/register' && state.fullPath != '/splash') {
+        if (state.fullPath != '/login' &&
+            state.fullPath != '/register' &&
+            state.fullPath != '/splash') {
           return '/login';
         }
         // Nếu đang ở splash thì chuyển đến login
@@ -99,7 +114,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
         return null;
       }
-      
+
       // Xảy ra lỗi, hiển thị splash để xử lý
       if (authStatus == AuthStatus.error) {
         if (state.fullPath != '/splash') {
@@ -107,7 +122,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
         return null;
       }
-      
+
       return null;
     },
     errorBuilder: (context, state) => Scaffold(
