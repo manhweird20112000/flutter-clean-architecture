@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../config/theme/app_theme.dart';
+import '../widgets/toolbar.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
   final String conversationId;
@@ -17,6 +18,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -80,9 +82,18 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           )
         ],
       ),
-      body: const Center(
-        child: Text('Chát'),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+
+        child: Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: const Center(
+            child: Text('Content chat'),
+          ),
+        ), // Đẩy nội dung lên theo bàn phím),
       ),
+      bottomNavigationBar: const ToolBarChat(),
     );
   }
 }

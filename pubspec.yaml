@@ -37,6 +37,7 @@ dependencies:
   intl: ^0.18.1
   flutter_svg: ^2.0.17
   jiffy: ^6.2.1
+  keyboard_avoider: ^0.2.0
 
 dev_dependencies:
   flutter_test:
